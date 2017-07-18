@@ -1,8 +1,9 @@
-function AIS = me_restingAsym(eegname,filename,sheet,xlRange)
+function AIS = me_restingAsym(eegname)
+%% start time should be in samples in the given xlRange, the read in file should only have the start time in samples listed as a number in the file %%
 
 lowerBound = 2;
 upperBound = 41;
-eegChannels = 1:14;
+eegChannels = 3:16;
 
  if regexp(eegname,'set$')
         EEG2 = pop_loadset(eegname);
@@ -14,22 +15,12 @@ eegChannels = 1:14;
 
  EEG_only = pop_select(EEG2, 'channel', eegChannels);
  EEG_only = pop_eegfilt(EEG_only, lowerBound, upperBound, [],[0], 0, 0, 'fir1', 0);
- 
- if regexp(filename, 'csv$')
-     start = csvread(filename,sheet,xlRange);
- elseif regexp(filename, 'xlsx$')
-     start = xlsread(filename,sheet,xlRange,'basic');
- else 
-     error('me_restingAsym: File type unknown');
- end 
- 
- EEG_data = EEG_only.data(:,start:(start+15360));
- 
- blob.Fs = 128;
- blob.data = EEG_data';
- 
- AIS = alphaImbalance(blob);
- 
+  
+     EEG_data = EEG_only.data(:,1:(1+15360));
+     blob.Fs = 128;
+     blob.data = EEG_data';
+     AIS = sepa_alphaAsymmetry(blob);
+
  
  end
  
